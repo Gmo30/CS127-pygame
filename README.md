@@ -1,2 +1,2 @@
-# Flappy Bird 
+# Flappy Bird CS 127
 ## Gordon Mo, Jacky Wong, Sara Perera
