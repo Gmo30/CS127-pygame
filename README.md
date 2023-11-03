@@ -6,8 +6,6 @@ import pygame
 import random
 
 pygame.init()
-clock = pygame.time.Clock()
-fsp = 60
 
 screen_width = 864
 screen_height = 936
