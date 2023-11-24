@@ -12,6 +12,7 @@ from pygame.locals import (
     K_LEFT,
     K_RIGHT,
     K_ESCAPE,
+    MOUSEBUTTONDOWN,
     KEYDOWN,
     QUIT,
 )
@@ -32,11 +33,9 @@ class Bird(pygame.sprite.Sprite):
             center=(
                 SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2
             ))
-    def update(self, pressed_keys):
-        if pressed_keys[K_UP]:
-            self.rect.move_ip(0, -5)
-        if pressed_keys[K_DOWN]:
-            self.rect.move_ip(0, 5)    
+    def update(self, num):
+        if num == 1:
+            self.rect.move_ip(0, -25)
 
     #keep player on screen
         if self.rect.top <= 0:
@@ -68,13 +67,10 @@ while running:
         #exiting window, quits game
         elif event.type == QUIT:
             running = False
+        if event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                bird.update(1)
     #screen.fill((255,255,255))
-
-    #get the set of keys that were pressed
-    pressed_keys = pygame.key.get_pressed()
-    #update bird's location
-    bird.update(pressed_keys)
-
     screen.blit(bg,(0,0))
     screen.blit(bird.surf, bird.rect)
     #flip everything to the display
