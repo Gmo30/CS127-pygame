@@ -12,6 +12,7 @@ from pygame.locals import (
     K_LEFT,
     K_RIGHT,
     K_ESCAPE,
+    K_SPACE,
     MOUSEBUTTONDOWN,
     KEYDOWN,
     QUIT,
@@ -33,13 +34,15 @@ class Bird(pygame.sprite.Sprite):
             center=(
                 SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2
             ))
-    def update(self, num):
-        if num == 1:
-            self.rect.move_ip(0, -25)
+    def update(self, pressed_keys):
+        if pressed_keys[K_SPACE]:
+            self.rect.move_ip(0, -10)
+        else:
+            self.rect.move_ip(0, +5)
 
     #keep player on screen
-        if self.rect.top <= 0:
-            self.rect.top = 0
+        if self.rect.top <= -100:
+            self.rect.top = -100
         elif self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
 
@@ -56,7 +59,7 @@ running = True
 
 #create our bird
 bird = Bird()
-
+move = False
 #our main loop 
 while running:
     for event in pygame.event.get():
@@ -64,15 +67,22 @@ while running:
             #if escape key is pressed, quit game
             if event.key == K_ESCAPE:
                 running = False
+            if event.key == K_SPACE:
+                move = True
         #exiting window, quits game
         elif event.type == QUIT:
             running = False
-        if event.type == MOUSEBUTTONDOWN:
-            if event.button == 1:
-                bird.update(1)
+    if move:
+        pressed_keys = pygame.key.get_pressed()
+        bird.update(pressed_keys)
+    
     #screen.fill((255,255,255))
     screen.blit(bg,(0,0))
     screen.blit(bird.surf, bird.rect)
+
+    #if bird touches floor, end game
+    if bird.rect.bottom == SCREEN_HEIGHT:
+        running = False
     #flip everything to the display
     pygame.display.flip()
     #60 frames per second
