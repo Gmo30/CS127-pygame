@@ -46,6 +46,17 @@ class Bird(pygame.sprite.Sprite):
         elif self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
 
+class Pipes(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Pipes, self).__init__()
+        self.surf = pygame.image.load("pipes.png").convert_alpha()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center=(
+                #random.randint(75, SCREEN_HEIGHT-25)
+                SCREEN_WIDTH/2+150, SCREEN_HEIGHT-15
+            ))
+
 #initialize pygame
 pygame.init()
 clock = pygame.time.Clock()
@@ -56,6 +67,8 @@ pygame.display.set_caption('Flappy Bird')
 
 #variable to keep main loop running
 running = True
+
+pipes = Pipes()
 
 #create our bird
 bird = Bird()
@@ -79,6 +92,7 @@ while running:
     #screen.fill((255,255,255))
     screen.blit(bg,(0,0))
     screen.blit(bird.surf, bird.rect)
+    screen.blit(pipes.surf, pipes.rect)
 
     #if bird touches floor, end game
     if bird.rect.bottom == SCREEN_HEIGHT:
