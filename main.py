@@ -49,7 +49,7 @@ class Bird(pygame.sprite.Sprite):
 class Pipes(pygame.sprite.Sprite):
     def __init__(self):
         super(Pipes, self).__init__()
-        self.surf = pygame.image.load("pipes.png").convert_alpha()
+        self.surf = pygame.image.load("transparent pipe.png").convert_alpha()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center=(
