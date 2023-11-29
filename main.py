@@ -49,16 +49,27 @@ class Bird(pygame.sprite.Sprite):
 class Pipes(pygame.sprite.Sprite):
     def __init__(self):
         super(Pipes, self).__init__()
-        self.surf = pygame.image.load("transparent pipe.png").convert_alpha()
+        self.surf = pygame.image.load("lower_pipe.png").convert_alpha()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center=(
                 #random.randint(75, SCREEN_HEIGHT-25)
-                SCREEN_WIDTH/2+150, SCREEN_HEIGHT-15
+                SCREEN_WIDTH/2+150, SCREEN_HEIGHT-100 #SCREEN_HEIGHT+200
+            ))
+    def top(self, lower):
+        super(Pipes, self).__init__()
+        self.surf = pygame.image.load("upper_pipe.png").convert_alpha()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        print(lower.rect.x)
+        self.rect = self.surf.get_rect(
+            bottomleft=(
+                lower.rect.x, lower.rect.y-160  
             ))
 
 #initialize pygame
 pygame.init()
+
+#set the clock for a decent framerate
 clock = pygame.time.Clock()
 
 #Create the screen object
@@ -68,7 +79,12 @@ pygame.display.set_caption('Flappy Bird')
 #variable to keep main loop running
 running = True
 
-pipes = Pipes()
+lower_pipe = Pipes()
+upper_pipe = Pipes()
+upper_pipe.top(lower_pipe)
+
+#group the pipes together
+
 
 #create our bird
 bird = Bird()
@@ -92,7 +108,8 @@ while running:
     #screen.fill((255,255,255))
     screen.blit(bg,(0,0))
     screen.blit(bird.surf, bird.rect)
-    screen.blit(pipes.surf, pipes.rect)
+    screen.blit(lower_pipe.surf, lower_pipe.rect)
+    screen.blit(upper_pipe.surf, upper_pipe.rect)
 
     #if bird touches floor, end game
     if bird.rect.bottom == SCREEN_HEIGHT:
