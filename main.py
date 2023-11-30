@@ -3,7 +3,6 @@
 
 #import libraries
 import pygame, random
-fsp = 60
 
 from pygame.locals import (
     RLEACCEL,
@@ -36,9 +35,9 @@ class Bird(pygame.sprite.Sprite):
             ))
     def update(self, pressed_keys):
         if pressed_keys[K_SPACE]:
-            self.rect.move_ip(0, -10)
+            self.rect.move_ip(0, -8)
         else:
-            self.rect.move_ip(0, +5)
+            self.rect.move_ip(0, +4)
 
     #keep player on screen
         if self.rect.top <= -100:
@@ -54,17 +53,21 @@ class Pipes(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(
             center=(
                 #random.randint(75, SCREEN_HEIGHT-25)
-                SCREEN_WIDTH/2+150, SCREEN_HEIGHT-100 #SCREEN_HEIGHT+200
+                SCREEN_WIDTH, random.randint(500,800) #SCREEN_HEIGHT+200
             ))
     def top(self, lower):
         super(Pipes, self).__init__()
         self.surf = pygame.image.load("upper_pipe.png").convert_alpha()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
-        print(lower.rect.x)
+        #print(lower.rect.x)
         self.rect = self.surf.get_rect(
             bottomleft=(
                 lower.rect.x, lower.rect.y-160  
             ))
+    def update(self):
+        self.rect.move_ip(-2, 0)
+        if self.rect.right < 0:
+            self.kill()
 
 #initialize pygame
 pygame.init()
@@ -79,12 +82,12 @@ pygame.display.set_caption('Flappy Bird')
 #variable to keep main loop running
 running = True
 
-lower_pipe = Pipes()
-upper_pipe = Pipes()
-upper_pipe.top(lower_pipe)
+#create custom events for adding a new pipe
+ADDPIPE = pygame.USEREVENT + 1
+pygame.time.set_timer(ADDPIPE, 2200)
 
 #group the pipes together
-
+pipes = pygame.sprite.Group()
 
 #create our bird
 bird = Bird()
@@ -101,6 +104,14 @@ while running:
         #exiting window, quits game
         elif event.type == QUIT:
             running = False
+        
+        elif event.type == ADDPIPE:
+            lower_pipe = Pipes()
+            upper_pipe = Pipes()
+            upper_pipe.top(lower_pipe)
+            pipes.add(lower_pipe)
+            pipes.add(upper_pipe)
+
     if move:
         pressed_keys = pygame.key.get_pressed()
         bird.update(pressed_keys)
@@ -108,9 +119,11 @@ while running:
     #screen.fill((255,255,255))
     screen.blit(bg,(0,0))
     screen.blit(bird.surf, bird.rect)
-    screen.blit(lower_pipe.surf, lower_pipe.rect)
-    screen.blit(upper_pipe.surf, upper_pipe.rect)
+    
+    for entity in pipes:
+        screen.blit(entity.surf, entity.rect)
 
+    pipes.update()
     #if bird touches floor, end game
     if bird.rect.bottom == SCREEN_HEIGHT:
         running = False
