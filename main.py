@@ -131,5 +131,15 @@ while running:
     pygame.display.flip()
     #60 frames per second
     clock.tick(60)
+    
+#adding sound effects
+#sound source: https://freesound.org/ 
+#license:
+pygame.mixer.music.load("    .mp3")
+pygame.mixer.music.play (loops = -1)
+
+move_up_sound = pygame.mixer.Sound(" .ogg")
+move_down_sound = pygame.mixer.Sound("  .ogg")
+collision_sound = pygame.mixer.Sound("  .ogg")
 
 pygame.quit()
