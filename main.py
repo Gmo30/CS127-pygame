@@ -135,11 +135,10 @@ while running:
 #adding sound effects
 #sound source: https://freesound.org/ 
 #license:
-pygame.mixer.music.load("    .mp3")
+pygame.mixer.music.load("jump sound.mp3")
 pygame.mixer.music.play (loops = -1)
 
-move_up_sound = pygame.mixer.Sound(" .ogg")
-move_down_sound = pygame.mixer.Sound("  .ogg")
-collision_sound = pygame.mixer.Sound("  .ogg")
+move_up_sound = pygame.mixer.Sound("jump sound.mp3")
+gameover_sound = pygame.mixer.Sound("game over sound.mp3")
 
 pygame.quit()
