@@ -133,12 +133,19 @@ while running:
     clock.tick(60)
     
 #adding sound effects
-#sound source: https://freesound.org/ 
-#license:
+#sound source: https://www.101soundboards.com/boards/10178-flappy-bird-sounds 
 pygame.mixer.music.load("jump sound.mp3")
+pygame.mixer.music.load("game over sound.mp3")
 pygame.mixer.music.play (loops = -1)
 
 move_up_sound = pygame.mixer.Sound("jump sound.mp3")
 gameover_sound = pygame.mixer.Sound("game over sound.mp3")
 
+def update(self, pressed_keys):
+        if pressed_keys[K_UP]:
+            move_up_sound.play()
+        if pressed_keys[K_DOWN]:
+            self.rect.move_ip(0, 5)
+            gameover_sound.play()
+            
 pygame.quit()
