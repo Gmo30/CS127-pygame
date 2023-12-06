@@ -39,9 +39,9 @@ class Bird(pygame.sprite.Sprite):
 
     def update(self, pressed_keys):
         if pressed_keys[K_SPACE]:
-            self.rect.move_ip(0, -7)
+            self.rect.move_ip(0, -8)
         else:
-            self.rect.move_ip(0, +4)
+            self.rect.move_ip(0, +3)
 
     #keep player on screen
         if self.rect.top <= -100:
@@ -86,16 +86,17 @@ pygame.display.set_caption('Flappy Bird')
 #variable to keep main loop running
 running = True
 
+move = False
+
 #create custom events for adding a new pipe
 ADDPIPE = pygame.USEREVENT + 1
-pygame.time.set_timer(ADDPIPE, 2200)
+pygame.time.set_timer(ADDPIPE, 2500)
 
 #group the pipes together
 pipes = pygame.sprite.Group()
 
 #create our bird
 bird = Bird()
-move = False
 #our main loop 
 while running:
     for event in pygame.event.get():
