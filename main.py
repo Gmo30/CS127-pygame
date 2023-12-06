@@ -12,6 +12,7 @@ from pygame.locals import (
     K_RIGHT,
     K_ESCAPE,
     K_SPACE,
+    K_h,
     MOUSEBUTTONDOWN,
     KEYDOWN,
     QUIT,
@@ -33,6 +34,9 @@ class Bird(pygame.sprite.Sprite):
             center=(
                 SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2
             ))
+    def purple(self):
+        self.surf = pygame.image.load("purple.png").convert_alpha()
+
     def update(self, pressed_keys):
         if pressed_keys[K_SPACE]:
             self.rect.move_ip(0, -7)
@@ -101,6 +105,8 @@ while running:
                 running = False
             if event.key == K_SPACE:
                 move = True
+            if event.key == K_h:
+                bird.purple()
         #exiting window, quits game
         elif event.type == QUIT:
             running = False
