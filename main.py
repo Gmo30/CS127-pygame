@@ -35,7 +35,7 @@ class Bird(pygame.sprite.Sprite):
             ))
     def update(self, pressed_keys):
         if pressed_keys[K_SPACE]:
-            self.rect.move_ip(0, -8)
+            self.rect.move_ip(0, -7)
         else:
             self.rect.move_ip(0, +4)
 
@@ -131,6 +131,10 @@ while running:
     pygame.display.flip()
     #60 frames per second
     clock.tick(60)
+
+    if pygame.sprite.spritecollideany(bird, pipes):
+        bird.kill()
+        running = False 
     
 #adding sound effects
 #sound source: https://www.101soundboards.com/boards/10178-flappy-bird-sounds 
