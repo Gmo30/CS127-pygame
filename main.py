@@ -7,13 +7,9 @@ import pygame, random
 from pygame.locals import (
     RLEACCEL,
     K_UP,
-    K_DOWN,
-    K_LEFT,
-    K_RIGHT,
     K_ESCAPE,
     K_SPACE,
     K_h,
-    MOUSEBUTTONDOWN,
     KEYDOWN,
     QUIT,
 )
@@ -66,12 +62,31 @@ class Pipes(pygame.sprite.Sprite):
         #print(lower.rect.x)
         self.rect = self.surf.get_rect(
             bottomleft=(
-                lower.rect.x, lower.rect.y-160  
+                lower.rect.x, lower.rect.y-180  
             ))
+
     def update(self):
-        self.rect.move_ip(-2, 0)
+        self.rect.move_ip(-1, 0)
         if self.rect.right < 0:
             self.kill()
+
+class Score(object):
+    def __init__(self):
+        self.black = 0,0,0
+        self.count = 0
+        pygame.font.init()
+        self.font = pygame.font.SysFont("comicsans",50, True , True)
+        self.text = self.font.render(str(self.count),1,self.black)
+
+    def show_score(self, screen):
+        screen.blit(self.text, (SCREEN_WIDTH/2,SCREEN_HEIGHT/2-200))
+
+    def score_up(self):
+        self.count += 1
+        self.text = self.font.render(str(self.count),1,self.black)
+
+#create Score object
+score = Score()
 
 #initialize pygame
 pygame.init()
@@ -90,10 +105,11 @@ move = False
 
 #create custom events for adding a new pipe
 ADDPIPE = pygame.USEREVENT + 1
-pygame.time.set_timer(ADDPIPE, 2500)
+pygame.time.set_timer(ADDPIPE, 5000)
 
 #group the pipes together
 pipes = pygame.sprite.Group()
+uP = pygame.sprite.Group()
 
 #create our bird
 bird = Bird()
@@ -118,6 +134,7 @@ while running:
             upper_pipe.top(lower_pipe)
             pipes.add(lower_pipe)
             pipes.add(upper_pipe)
+            uP.add(upper_pipe)
 
     if move:
         pressed_keys = pygame.key.get_pressed()
@@ -130,10 +147,16 @@ while running:
     for entity in pipes:
         screen.blit(entity.surf, entity.rect)
 
+    for pipe in uP:
+        if bird.rect.left == pipe.rect.right:
+            score.score_up()
+
     pipes.update()
     #if bird touches floor, end game
     if bird.rect.bottom == SCREEN_HEIGHT:
         running = False
+
+    score.show_score(screen)
     #flip everything to the display
     pygame.display.flip()
     #60 frames per second
