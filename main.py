@@ -6,7 +6,6 @@ import pygame, random
 
 from pygame.locals import (
     RLEACCEL,
-    K_UP,
     K_ESCAPE,
     K_SPACE,
     K_h,
@@ -24,15 +23,20 @@ bg = pygame.image.load("background.png")
 class Bird(pygame.sprite.Sprite):
     def __init__(self):
         super(Bird, self).__init__()
-        self.surf = pygame.image.load("bird.png").convert_alpha()
-        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.load_images()
         self.rect = self.surf.get_rect(
-            center=(
-                SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2
-            ))
+            center = (SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2)
+        )
+        
+    def load_images(self):
+        self.surf = pygame.image.load("bird.png").convert_alpha()
+        self.surf.set_colorkey(pygame.Color("white"), RLEACCEL)
+
+    #load in purple version of the bird
     def purple(self):
         self.surf = pygame.image.load("purple.png").convert_alpha()
 
+    #controls vertical movement
     def update(self, pressed_keys):
         if pressed_keys[K_SPACE]:
             self.rect.move_ip(0, -8)
@@ -55,6 +59,7 @@ class Pipes(pygame.sprite.Sprite):
                 #random.randint(75, SCREEN_HEIGHT-25)
                 SCREEN_WIDTH, random.randint(500,800) #SCREEN_HEIGHT+200
             ))
+        
     def top(self, lower):
         super(Pipes, self).__init__()
         self.surf = pygame.image.load("upper_pipe.png").convert_alpha()
@@ -101,11 +106,16 @@ pygame.display.set_caption('Flappy Bird')
 #variable to keep main loop running
 running = True
 
+#keep the bird from moving
 move = False
+
+#game over state flag
+game_over = False
 
 #create custom events for adding a new pipe
 ADDPIPE = pygame.USEREVENT + 1
-pygame.time.set_timer(ADDPIPE, 5000)
+PIPE_ADD_INTERVAL = 5000
+pygame.time.set_timer(ADDPIPE, PIPE_ADD_INTERVAL)
 
 #group the pipes together
 pipes = pygame.sprite.Group()
@@ -113,6 +123,46 @@ uP = pygame.sprite.Group()
 
 #create our bird
 bird = Bird()
+
+#game over function
+def display_game_over_screen():
+    #clear screen
+    screen.fill((255, 255, 255))
+
+    #display game over text
+    font1 = pygame.font.SysFont("comicsans", 50, True)
+    game_over_text = font1.render("Game Over", 1, (0, 0, 0))
+    game_over_text_rect = game_over_text.get_rect(center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 40))
+    screen.blit(game_over_text, game_over_text_rect)
+    
+    #display final score
+    score_text = font1.render(f"Final Score: {score.count}", 1, (0, 0, 0))
+    score_text_rect = score_text.get_rect(center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
+    screen.blit(score_text, score_text_rect)
+
+    #reset game instructions
+    font2 = pygame.font.SysFont("comicsans", 30, False, True)
+    reset_instruction_text = font2.render("press space to replay", 1, (0, 0, 0))
+    reset_instruction_text_rect = reset_instruction_text.get_rect(center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 40))
+    screen.blit(reset_instruction_text, reset_instruction_text_rect)
+
+#reset game after game over function
+def reset_game():
+    global game_over
+    game_over = False
+
+    #reset game variables
+    score.count = 0
+
+    #reset bird position
+    bird.rect.x = SCREEN_WIDTH/2 - 100
+    bird.rect.y = SCREEN_HEIGHT/2
+
+    #remove existing pipes
+    pipes.empty()
+    uP.empty()
+    pygame.time.set_timer(ADDPIPE, PIPE_ADD_INTERVAL)
+
 #our main loop 
 while running:
     for event in pygame.event.get():
@@ -127,7 +177,6 @@ while running:
         #exiting window, quits game
         elif event.type == QUIT:
             running = False
-        
         elif event.type == ADDPIPE:
             lower_pipe = Pipes()
             upper_pipe = Pipes()
@@ -139,43 +188,61 @@ while running:
     if move:
         pressed_keys = pygame.key.get_pressed()
         bird.update(pressed_keys)
-    
-    #screen.fill((255,255,255))
-    screen.blit(bg,(0,0))
+
+    #clear the screen
+    screen.blit(bg, (0, 0))
     screen.blit(bird.surf, bird.rect)
     
     for entity in pipes:
         screen.blit(entity.surf, entity.rect)
 
-    for pipe in uP:
-        if bird.rect.left == pipe.rect.right:
-            score.score_up()
+    #score increment when game in-progress
+    if not game_over:
+        for pipe in uP:
+            if bird.rect.left == pipe.rect.right:
+                score.score_up()
 
     pipes.update()
-    #if bird touches floor, end game
-    if bird.rect.bottom == SCREEN_HEIGHT:
-        running = False
 
     score.show_score(screen)
-    #flip everything to the display
-    pygame.display.flip()
-    #60 frames per second
-    clock.tick(60)
 
+    #if bird touches floor, end game
+    if bird.rect.bottom == SCREEN_HEIGHT:
+        game_over = True
+    
+    #if bird collides into any pipes, end game
     if pygame.sprite.spritecollideany(bird, pipes):
         bird.kill()
-        running = False 
+        game_over = True
+
+    if game_over:
+        pygame.event.get()
+
+        #display game over screen
+        display_game_over_screen()
+
+        #restart input
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    reset_game()
+
+    #flip everything to the display
+    pygame.display.flip()
+
+    #60 frames per second
+    clock.tick(60)
     
-#adding sound effects
+#sound effects
 #sound source: https://www.101soundboards.com/boards/10178-flappy-bird-sounds 
 pygame.mixer.music.load("jump sound.mp3")
 pygame.mixer.music.load("game over sound.mp3")
-
 move_up_sound = pygame.mixer.Sound("jump sound.mp3")
 gameover_sound = pygame.mixer.Sound("game over sound.mp3")
 
+#keying sound effects to pressed keys
 def update(self, pressed_keys):
-        if pressed_keys[K_UP]:
+        if pressed_keys[K_SPACE]:
             move_up_sound.play()
         if bird.rect.bottom == SCREEN_HEIGHT:
             gameover_sound.play()
